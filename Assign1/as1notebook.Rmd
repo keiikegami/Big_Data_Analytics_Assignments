@@ -1,0 +1,44 @@
+---
+title: "Big Data Analytics Assignment 1"
+output: html_notebook
+---
+
+First I load the data files
+```{r}
+dat <- read.csv("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/migration2012.csv")
+head(dat)
+```
+
+```{r}
+states <- read.csv("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/states_chord.csv")
+head(states)
+```
+
+Next I reshape dat into the handful data format. I use **tidyr package** for the aim instead of **reshape package** because the foramer is the improved version of the latter.
+
+```{r}
+install.packages('tidyverse')
+library(tidyverse)
+```
+
+```{r}
+state_names = names(dat)[2:length(names(dat))]
+dat %>%
+tidyr::gather(key=from, value=value, Alabama,Alaska,Arizona,Arkansas,California,Colorado,Connecticut,Delaware,District.of.Columbia,Florida,Georgia,Hawaii,Idaho,Illinois,Indiana,Iowa,Kansas,Kentucky,Louisiana,Maine,Maryland,Massachusetts,Michigan,Minnesota,Mississippi,Missouri,Montana,Nebraska,Nevada,New.Hampshire,New.Jersey,New.Mexico,New.York,North.Carolina,North.Dakota,Ohio,Oklahoma,Oregon,Pennsylvania,Rhode.Island,South.Carolina,South.Dakota,Tennessee,Texas,Utah,Vermont,Virginia,Washington,West.Virginia,Wisconsin,Wyoming)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
