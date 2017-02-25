@@ -6,12 +6,10 @@ output: html_notebook
 First I load the data files
 ```{r}
 dat <- read.csv("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/migration2012.csv")
-head(dat)
 ```
 
 ```{r}
 states <- read.csv("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/states_chord.csv")
-head(states)
 ```
 
 Next I reshape dat into the handful data format. I use **tidyr package** for the aim instead of **reshape package** because the foramer is the improved version of the latter.
@@ -22,13 +20,49 @@ library(tidyverse)
 ```
 
 ```{r}
-state_names = names(dat)[2:length(names(dat))]
-dat %>%
-tidyr::gather(key=from, value=value, Alabama,Alaska,Arizona,Arkansas,California,Colorado,Connecticut,Delaware,District.of.Columbia,Florida,Georgia,Hawaii,Idaho,Illinois,Indiana,Iowa,Kansas,Kentucky,Louisiana,Maine,Maryland,Massachusetts,Michigan,Minnesota,Mississippi,Missouri,Montana,Nebraska,Nevada,New.Hampshire,New.Jersey,New.Mexico,New.York,North.Carolina,North.Dakota,Ohio,Oklahoma,Oregon,Pennsylvania,Rhode.Island,South.Carolina,South.Dakota,Tennessee,Texas,Utah,Vermont,Virginia,Washington,West.Virginia,Wisconsin,Wyoming)
+dat <- dat %>%
+tidyr::gather(key=From, value=value, Alabama,Alaska,Arizona,Arkansas,California,Colorado,Connecticut,Delaware,District.of.Columbia,Florida,Georgia,Hawaii,Idaho,Illinois,Indiana,Iowa,Kansas,Kentucky,Louisiana,Maine,Maryland,Massachusetts,Michigan,Minnesota,Mississippi,Missouri,Montana,Nebraska,Nevada,New.Hampshire,New.Jersey,New.Mexico,New.York,North.Carolina,North.Dakota,Ohio,Oklahoma,Oregon,Pennsylvania,Rhode.Island,South.Carolina,South.Dakota,Tennessee,Texas,Utah,Vermont,Virginia,Washington,West.Virginia,Wisconsin,Wyoming)
 ```
 
+Delete the puctuations.
 
+```{r}
+dat <- data.frame(apply(dat, 2, function(y) gsub("[[:punct:]]", " ", y)))
+dat
+```
 
+Then I add two new columns to the above data frame.
+mergeでNew Hampshireみたいな奴らが消えてる。
+
+```{r}
+d1 <- merge(dat, states, by.x="From", by.y="States")
+d1 <- d1[,c(-5,-6)]
+names(d1)[4] <- "ID_From"
+
+d2 <- merge(d1, states, by.x="To", by.y="States")
+d2 <- d2[,c(-6,-7)]
+names(d2)[5] <- "ID_To"
+dat <- d2
+dat
+```
+
+Sort the data frame in the ascending order
+
+```{r}
+dat <- arrange(dat, ID_From)
+dat <- arrange(dat, ID_To)
+dat
+```
+
+Convert the above data frame into the matrix form
+
+```{r}
+test <- dat[,c(1,2,3)]
+test
+
+test %>%
+  tidyr::spread(key=From, value=value)
+```
 
 
 
