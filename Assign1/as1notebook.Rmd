@@ -57,14 +57,26 @@ dat
 Convert the above data frame into the matrix form
 
 ```{r}
-test <- dat[,c(1,2,3)]
-test
+test <- dat[,c(-5)]
+test <- test %>%
+  spread(key=To, value=value) %>%
+  arrange(ID_From)
 
-test %>%
-  tidyr::spread(key=From, value=value)
+test
 ```
 
+```{r}
+test2 <- dat[,c(1,4,5)]
+test2 <- test2 %>%
+  spread(key=To, value=ID_To)
 
+id <- test2[1,]
+n <- data.frame(c("ID"))
+n <- cbind(n,id)
+names(n)[1] <- c("From")
+
+rbind(test,n)
+```
 
 
 
