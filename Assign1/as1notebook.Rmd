@@ -114,6 +114,7 @@ library(dplyr)
 library(sp)
 library(rgdal)
 library(leaflet)
+library(ggmap)
 
 # Bus Stops
 SOL <- readOGR("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/BusStops1216","StopsOnLines1216")
@@ -136,28 +137,21 @@ I2 <- readOGR("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data
 I2.pj <- spTransform(I2, CRS("+proj=longlat +datum=WGS84"))
 ```
 
-make Line_lists
+make Line_list
 ```{r}
 tmp_CC <- geometry(CC.pj)
 tmp_LE <- geometry(LE.pj)
 tmp_LCBD <- geometry(LCBD.pj)
 tmp_LNCBD <- geometry(LNCBD.pj)
 tmp_RBRT <- geometry(RBRT.pj)
-
-Line_list_CC <- list()
-Line_list_LE <- list()
-Line_list_LCBD <- list()
-Line_list_LNCBD <- list()
-Line_list_RBRT <- list()
-
 tmps <- list(tmp_CC, tmp_LE, tmp_LCBD, tmp_LNCBD, tmp_RBRT)
-Line_lists <- list(Line_list_CC, Line_list_LE, Line_list_LCBD, Line_list_LNCBD, Line_list_RBRT)
+
+Line_list <- list()
 for (i in 1:5){
   for (j in 1:length(tmps[[i]])){
-    Line_lists[[i]] <- c(Line_list[[i]], tmps[[i]][j]@lines[[1]]@Lines)
+    Line_list <- c(Line_list, tmps[[i]][j]@lines[[1]]@Lines)
   }
 }
-
 ```
 
 make new_id
@@ -172,6 +166,19 @@ new_id <- sapply(1:length(LinLSs), function(x) paste0(x, "_", seq.int(LinLSs[[x]
   unlist()
 ```
 
+make new lines and LA map
+```{r}
+SLDF <- mapply(function(x, y) Lines(x, ID = y), x = Line_list, y = new_id)
+dat <- geocode('Los Angels')
+
+SOL.pj@data
+
+leaflet() %>%
+  setView(lng = -118.2437, lat = 34.05223	, zoom = 11) %>%
+  addPolylines(data = SLDF, color = "black", opacity = 1, weight = 1) %>% 
+  addCircles(data=bus.st.pj@data,LONG, LAT, color = "red", weight = 0.3) %>%
+  addTiles()
+```
 
 
 
