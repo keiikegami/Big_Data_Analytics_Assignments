@@ -32,7 +32,6 @@ dat
 ```
 
 Then I add two new columns to the above data frame.
-mergeでNew Hampshireみたいな奴らが消えてる。
 
 ```{r}
 d1 <- merge(dat, states, by.x="From", by.y="States")
@@ -57,25 +56,34 @@ dat
 Convert the above data frame into the matrix form
 
 ```{r}
-test <- dat[,c(-5)]
-test <- test %>%
-  spread(key=To, value=value) %>%
-  arrange(ID_From)
-
-test
-```
-
-```{r}
-test2 <- dat[,c(1,4,5)]
-test2 <- test2 %>%
+t1 <- dat[,c(1,2,4,5)]
+t1 <- t1 %>%
   spread(key=To, value=ID_To)
 
-id <- test2[1,]
-n <- data.frame(c("ID"))
-n <- cbind(n,id)
-names(n)[1] <- c("From")
+t2 <- dat[,c(1,2,3,4)]
+t2 <- t2 %>%
+  spread(key=To, value=value)
 
-rbind(test,n)
+t3 <- rbind(t1[1,],t2)
+t3$From <- as.character(t3$From)
+t3[1,2] <- 0
+t3[1,1] <- "ID_To"
+t3 <- t3 %>%
+  arrange(ID_From)
+
+library(data.table)
+setcolorder(t3,c("From","ID_From","Connecticut","Maine","Massachusetts","New Hampshire","Rhode Island",
+"Vermont","New Jersey","New York","Pennsylvania","Illinois","Indiana",
+"Michigan","Ohio","Wisconsin","Iowa","Kansas","Minnesota",
+"Missouri","Nebraska","North Dakota","South Dakota","Delaware","Florida",
+"Georgia","Maryland","North Carolina","South Carolina","Virginia","District of Columbia",
+"West Virginia","Alabama","Kentucky","Mississippi","Tennessee","Arkansas",
+"Louisiana","Oklahoma","Texas","Arizona","Colorado","Idaho",
+"Montana","Nevada","New Mexico","Utah","Wyoming","Alaska",
+"California","Hawaii","Oregon","Washington"))
+
+t3 <- t3[c(-1),c(-2)]
+t3
 ```
 
 
