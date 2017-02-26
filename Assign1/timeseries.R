@@ -29,12 +29,23 @@ hc <- highchart(type="stock") %>%
   hc_title(text="Charting Exchange Rates") %>% 
   hc_subtitle(text = "Data extracted using quantmod package") %>% 
   hc_yAxis_multiples(
-    list(top = "0%", height = "50%", offset=0, opposite=TRUE, lineWidth=2),
-    list(top = "50%", height = "50%", offset=0, opposite=TRUE, lineWidth=2)
+    list(top = "0%", height = "50%", offset=0, opposite=TRUE),
+    list(top = "50%", height = "50%", offset=0, opposite=TRUE)
   )%>%
-  hc_add_series(x, id = "audjpy", yAxis=0, color="blue") %>%
-  hc_add_series(x.BBands.ll, id = "audjpy.l", yAxis=0, color="black",dashStyle='shortdash') %>%
-  hc_add_series(y, id = "gbpusd", yAxis=1, color="green") %>%
+  hc_add_series(x, id = "audjpy",name ="audjpy", yAxis=0, color="blue", lineWidth=1.5) %>%
+  hc_add_series(x.BBands.ll, id = "audjpy.ll", name="audjpy Lower BBands",yAxis=0,
+                color="black",dashStyle='shortdash', lineWidth=1) %>%
+  hc_add_series(x.BBands.ul, id = "audjpy.ul", name="audjpy Upper BBands",yAxis=0,
+                color="black",lineWidth=1) %>%
+  hc_add_series(x.BBands.m, id = "audjpy.m",name="audjpy BBands MA", yAxis=0,
+                color="red",lineWidth=1) %>%
+  hc_add_series(y, id = "gbpusd",name="gbpusd",yAxis=1, color="green", lineWidth=1.5) %>%
+  hc_add_series(y.BBands.ll, id = "gbpusd.ll",name="gbpusd Lower BBands", yAxis=1,
+                color="black",dashStyle='shortdash',lineWidth=1) %>%
+  hc_add_series(y.BBands.ul, id = "gbpusd.ul",name="gbpusd Upper BBands", yAxis=1,
+                color="black",lineWidth=1) %>%
+  hc_add_series(y.BBands.m, id = "gbpusd.m",name="gbpusd BBands MA", yAxis=1,
+                color="red",lineWidth=1) %>%
   hc_add_theme(hc_theme_538())
 
 hc
