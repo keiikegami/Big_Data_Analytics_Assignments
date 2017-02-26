@@ -6,10 +6,12 @@ output: html_notebook
 First I load the data files
 ```{r}
 dat <- read.csv("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/migration2012.csv")
+head(dat)
 ```
 
 ```{r}
 states <- read.csv("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/states_chord.csv")
+states
 ```
 
 Next I reshape dat into the handful data format. I use **tidyr package** for the aim instead of **reshape package** because the foramer is the improved version of the latter.
@@ -83,9 +85,21 @@ setcolorder(t3,c("From","ID_From","Connecticut","Maine","Massachusetts","New Ham
 "California","Hawaii","Oregon","Washington"))
 
 t3 <- t3[c(-1),c(-2)]
-t3
+
+t4 <- t3[,-1]
+rownames(t4) <- t3[,1]
+
+t5 <- data.frame(apply(t4, 2, function(y) as.numeric(y)))
+rownames(t5) <- t3[,1]
+t5
 ```
 
+Drawing the chord diagram
+```{r}
+library(chorddiag)
+
+chorddiag(as.matrix(t5),groupColors=states$Color,showTicks=F,groupnamePadding=20,groupThickness=.05,groupnameFontsize=10)
+```
 
 
 
