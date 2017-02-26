@@ -106,8 +106,7 @@ chorddiag(as.matrix(t5),groupColors=states$Color,showTicks=F,groupnamePadding=20
 
 ## Q2
 
-
-
+まだindividualを入れてないです。
 Read "Stops On Lines" and the all GIS data of bus lines.
 ```{r}
 library(dplyr)
@@ -196,7 +195,18 @@ leaflet() %>%
 ```
 
 
+## Q3
 
+The code is as follows
+```{r}
+library(quantmod)
+library(highcharter)
+
+x <- getSymbols("AUD/JPY", src = "oanda", auto.assign = FALSE)
+y <- getSymbols("GBP/USD", src = "oanda", auto.assign = FALSE)
+
+
+```
 
 
 
