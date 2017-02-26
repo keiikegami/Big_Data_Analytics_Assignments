@@ -3,6 +3,8 @@ title: "Big Data Analytics Assignment 1"
 output: html_notebook
 ---
 
+## Q1
+
 First I load the data files
 ```{r}
 dat <- read.csv("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/migration2012.csv")
@@ -100,6 +102,93 @@ library(chorddiag)
 
 chorddiag(as.matrix(t5),groupColors=states$Color,showTicks=F,groupnamePadding=20,groupThickness=.05,groupnameFontsize=10)
 ```
+
+
+## Q2
+
+
+
+Read "Stops On Lines" and the all GIS data of bus lines.
+```{r}
+library(dplyr)
+library(sp)
+library(rgdal)
+library(leaflet)
+
+# Bus Stops
+SOL <- readOGR("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/BusStops1216","StopsOnLines1216")
+SOL.pj <- spTransform(SOL, CRS("+proj=longlat +datum=WGS84"))
+
+# Bus Routes
+CC <- readOGR("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/ComCir1216","ComCir1216")
+CC.pj <- spTransform(CC, CRS("+proj=longlat +datum=WGS84"))
+LE <- readOGR("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/LimExp1216","LimExp1216")
+LE.pj <- spTransform(LE, CRS("+proj=longlat +datum=WGS84"))
+LCBD <- readOGR("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/LocalCBD1216","LocalCBD1216")
+LCBD.pj <- spTransform(LCBD, CRS("+proj=longlat +datum=WGS84"))
+LNCBD <- readOGR("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/LocalNonCBD1216","LocalNonCBD1216")
+LNCBD.pj <- spTransform(LNCBD, CRS("+proj=longlat +datum=WGS84"))
+RBRT <- readOGR("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/RapidBRT1216","RapidBRT1216")
+RBRT.pj <- spTransform(RBRT, CRS("+proj=longlat +datum=WGS84"))
+
+# とりあえずindividual2についてのみreadできることを確認。一旦放置してこれ以外でできるか試す。
+I2 <- readOGR("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/Individuals1216","2")
+I2.pj <- spTransform(I2, CRS("+proj=longlat +datum=WGS84"))
+```
+
+make Line_lists
+```{r}
+tmp_CC <- geometry(CC.pj)
+tmp_LE <- geometry(LE.pj)
+tmp_LCBD <- geometry(LCBD.pj)
+tmp_LNCBD <- geometry(LNCBD.pj)
+tmp_RBRT <- geometry(RBRT.pj)
+
+Line_list_CC <- list()
+Line_list_LE <- list()
+Line_list_LCBD <- list()
+Line_list_LNCBD <- list()
+Line_list_RBRT <- list()
+
+tmps <- list(tmp_CC, tmp_LE, tmp_LCBD, tmp_LNCBD, tmp_RBRT)
+Line_lists <- list(Line_list_CC, Line_list_LE, Line_list_LCBD, Line_list_LNCBD, Line_list_RBRT)
+for (i in 1:5){
+  for (j in 1:length(tmps[[i]])){
+    Line_lists[[i]] <- c(Line_list[[i]], tmps[[i]][j]@lines[[1]]@Lines)
+  }
+}
+
+```
+
+make new_id
+```{r}
+pjs <- list(CC.pj, LE.pj, LCBD.pj, LNCBD.pj, RBRT.pj)
+LinLSs <- list()
+for (i in 1:5){
+ LinLSs <- c(LinLSs, sapply(pjs[[i]]@lines, function(x) length(x@Lines)))
+}
+
+new_id <- sapply(1:length(LinLSs), function(x) paste0(x, "_", seq.int(LinLSs[[x]]))) %>% 
+  unlist()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
