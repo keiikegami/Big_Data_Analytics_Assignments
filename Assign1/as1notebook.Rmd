@@ -152,8 +152,6 @@ for (i in 1:5){
     Line_list <- c(Line_list, tmps[[i]][j]@lines[[1]]@Lines)
   }
 }
-
-summary(Line_list)
 ```
 
 
@@ -168,29 +166,31 @@ LinLSs <- LinLSs %>% unlist()
 
 new_id <- sapply(1:length(LinLSs), function(x) paste0(x, "_", seq.int(LinLSs[[x]]))) %>% 
   unlist()
-
-new_id
 ```
 
 ```{r}
-LinLSs
 ## make a new data.frame (only route_id)
-df <- data.frame(route_id = rep(@data$VAR_IDENT, times = LinLSs))
-rownames(df) <- new_id
+DAT=data.frame(matrix(rep(NA,1),nrow=1))[-1,]
+for (i in 1:5){
+  df <- data.frame(route_id = pjs[[i]]@data$VAR_IDENT)
+  DAT <- rbind(DAT, df)
+}
+rownames(DAT) <- new_id
 
-SLDF <- mapply(function(x, y) Lines(x, ID = y), x = Line_list, y = new_id) %>% list()
+SLDF <- mapply(function(x, y) Lines(x, ID = y), x = Line_list, y = new_id) %>%
+  #list() %>%
   SpatialLines() %>% 
+  SpatialLinesDataFrame(data = DAT)
 ```
 
 
 make new lines and LA map
 ```{r}
-SLDF <- mapply(function(x, y) Lines(x, ID = y), x = Line_list, y = new_id)
 dat <- geocode('Los Angels')
 
 leaflet() %>%
   setView(lng = dat['lon'], lat = dat['lat']	, zoom = 11) %>%
-  #addPolylines(data = SLDF, color = "black", opacity = 1, weight = 1) %>% 
+  addPolylines(data = SLDF, color = "black", opacity = 1, weight = 1) %>% 
   addCircles(data=SOL.pj@data,~LONG, ~LAT, color = "red", weight = 0.3) %>%
   addTiles()
 ```
