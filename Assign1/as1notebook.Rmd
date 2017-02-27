@@ -247,6 +247,27 @@ hc
 
 ## Q4
 
+Load libraries and check the raw data. And make ffdf after converting character columns to factor columns in original df.
+```{r}
+library(nycflights13)
+library(ffbase)
+library(ffbase2)
+library(biglm)
+library(pROC)
+
+tmp <- flights
+tmp$carrier <- as.factor(tmp$carrier)
+tmp$tailnum <- as.factor(tmp$tailnum)
+tmp$origin <- as.factor(tmp$origin)
+tmp$dest <- as.factor(tmp$dest)
+
+flightff <- as.ffdf(tmp)
+```
+
+Next I make new columns as follows
+```{r}
+
+```
 
 
 
