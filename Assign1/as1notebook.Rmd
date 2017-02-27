@@ -311,8 +311,15 @@ test_confusion <- addmargins(test_confusion)
 test_confusion
 ```
 
+Draw ROC curve
+```{r}
+test_pred <- predict(fit, newdata = testset, type="response")
+roc <- roc(as.integer(as.data.frame(testset)$Delay), as.numeric(test_pred))
+plot(roc)
+```
 
 
+## Q5
 
 
 
