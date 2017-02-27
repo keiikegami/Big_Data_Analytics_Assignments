@@ -254,6 +254,7 @@ library(ffbase)
 library(ffbase2)
 library(biglm)
 library(pROC)
+library(chron)
 
 tmp <- flights
 tmp$carrier <- as.factor(tmp$carrier)
@@ -266,7 +267,11 @@ flightff <- as.ffdf(tmp)
 
 Next I make new columns as follows
 ```{r}
-
+flightff$Delay <- ffifelse(flightff$dep_delay > 0, 1,0)
+flightff$DepHour <- flightff$hour
+flightff$Car <- ffifelse(flightff$carrier %in% as.factor(c("DL","US","DH","UA")), 1, 0)
+flightff$Night <- ffifelse(flightff$hour > 18 | flightff$hour < 6, 1, 0)
+flightff$Weekend <- ffifelse(day.of.week(month=flightff$month, day=flightff$day, year=flightff$year) == 6, 1, 0)
 ```
 
 
