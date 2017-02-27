@@ -321,6 +321,63 @@ plot(roc)
 
 ## Q5
 
+First I load the data. And before using spark I delete the irrelevant columns.
+```{r}
+library(sparklyr)
+library(dplyr)
+library(readr)
+sc <- spark_connect(master = "local")
+
+# 元のcsvに問題があるっぽい？ → Unspecifiedが怒られてるっぽい　→　Unspecifiedを0に変えるか。→今度はPASSENGER VEHICKEが怒られる。
+# 要するにStringが全部ダメっぽい。でもtitanicではStringも上手く渡せてる。なぜ？
+# 二つの例から空白は別に問題ではないことがわかる。
+dat <- read_csv("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/NYPD_Motor_Vehicle_Collisions.csv")
+dat <- dat[,c("BOROUGH","LATITUDE","LONGITUDE","UNIQUE KEY")]
+nypd_tbl <- copy_to(sc, dat, "nypd_tbl",overwrite = TRUE)
+```
+
+Remove the observations satisfying the condition
+```{r}
+nypd_tbl <- nypd_tbl %>%
+  filter(BOROUGH!="",!is.na(LATITUDE),!is.na(LONGITUDE),LATITUDE!=0,LONGITUDE!=0)
+nypd_tbl
+```
+
+Split this data into trainset and testset.
+```{r}
+partitions <- nypd_tbl %>%
+  sdf_partition(training = 0.9, test = 0.1, seed = 123)
+train <- partitions[1]$training
+test <- partitions[2]$test
+```
+
+Use Decision tree
+```{r}
+decision_tree <- train %>%
+  ml_decision_tree(response="BOROUGH", features = c("LATITUDE","LONGITUDE"), max.bins = 200L, max.depth = 10L, seed=123L) %>%
+```
+
+Prediction
+```{r}
+pred <- sdf_predict(decision_tree, test) %>%
+  collect
+
+table(pred$BOROUGH, pred$prediction)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
