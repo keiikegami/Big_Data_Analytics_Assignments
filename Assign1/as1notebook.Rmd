@@ -274,8 +274,42 @@ flightff$Night <- ffifelse(flightff$hour > 18 | flightff$hour < 6, 1, 0)
 flightff$Weekend <- ffifelse(day.of.week(month=flightff$month, day=flightff$day, year=flightff$year) == 6, 1, 0)
 ```
 
+I exclude the rows whose Delay values are NA and rename it to logitff.
+And then I split the dataset into train set and test set.
+```{r}
+logitff <- flightff[!is.na(flightff$Delay),]
 
+indx <- ff(1:nrow(logitff))
+p <- 0.7
+trainIndx <- ff(indx[1:trunc(length(indx)*p)])
+trainset <- logitff[trainIndx,]
+testIndx <- ff(indx[(trunc(length(indx)*p)+1):length(indx)])
+testset <- logitff[testIndx,]
+```
 
+Logistic regression 
+```{r}
+fit <- bigglm.ffdf(Delay~DepHour+Car+Night+Weekend, data = trainset, family=binomial(), sandwich=TRUE)
+summary(fit)
+```
+
+predict and make confusionmatrix in train_set
+```{r}
+train_pred <- predict(fit, newdata = trainset, type="response")
+train_pred <- ifelse(train_pred>0.5, 1,0)
+train_confusion <- table(as.integer(as.data.frame(trainset)$Delay), as.integer(train_pred))
+train_confusion <- addmargins(train_confusion)
+train_confusion
+```
+
+predict and make confusionmatrix in test_set
+```{r}
+test_pred <- predict(fit, newdata = testset, type="response")
+test_pred <- ifelse(test_pred>0.5, 1,0)
+test_confusion <- table(as.integer(as.data.frame(testset)$Delay), as.integer(test_pred))
+test_confusion <- addmargins(test_confusion)
+test_confusion
+```
 
 
 
