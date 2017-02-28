@@ -106,7 +106,6 @@ chorddiag(as.matrix(t5),groupColors=states$Color,showTicks=F,groupnamePadding=20
 
 ## Q2
 
-まだindividualを入れてないです。
 Read "Stops On Lines" and the all GIS data of bus lines.
 ```{r}
 library(dplyr)
@@ -131,22 +130,31 @@ LNCBD.pj <- spTransform(LNCBD, CRS("+proj=longlat +datum=WGS84"))
 RBRT <- readOGR("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/RapidBRT1216","RapidBRT1216")
 RBRT.pj <- spTransform(RBRT, CRS("+proj=longlat +datum=WGS84"))
 
-# とりあえずindividual2についてのみreadできることを確認。一旦放置してこれ以外でできるか試す。
-I2 <- readOGR("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/Individuals1216","2")
-I2.pj <- spTransform(I2, CRS("+proj=longlat +datum=WGS84"))
-```
-
-make Line_list
-```{r}
 tmp_CC <- geometry(CC.pj)
 tmp_LE <- geometry(LE.pj)
 tmp_LCBD <- geometry(LCBD.pj)
 tmp_LNCBD <- geometry(LNCBD.pj)
 tmp_RBRT <- geometry(RBRT.pj)
-tmps <- list(tmp_CC, tmp_LE, tmp_LCBD, tmp_LNCBD, tmp_RBRT)
+
+# Individual Bus Route
+pjs <- list()
+tmps <- list()
+layer_list <- ogrListLayers("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/Individuals1216")
+for (i in layer_list){
+  if (i != 728){
+    a <- spTransform(readOGR("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/Individuals1216", toString(i)), CRS("+proj=longlat +datum=WGS84"))
+    pjs <- c(pjs, a)
+    tmps <- c(tmps, geometry(a))
+  }
+}
+```
+
+make Line_list
+```{r}
+tmps <- c(tmps, tmp_CC, tmp_LE, tmp_LCBD, tmp_LNCBD, tmp_RBRT)
 
 Line_list <- list()
-for (i in 1:5){
+for (i in 1:length(tmps)){
   for (j in 1:length(tmps[[i]])){
     Line_list <- c(Line_list, tmps[[i]][j]@lines[[1]]@Lines)
   }
@@ -156,9 +164,9 @@ for (i in 1:5){
 
 make new_id
 ```{r}
-pjs <- list(CC.pj, LE.pj, LCBD.pj, LNCBD.pj, RBRT.pj)
+pjs <- c(pjs, CC.pj, LE.pj, LCBD.pj, LNCBD.pj, RBRT.pj)
 LinLSs <- list()
-for (i in 1:5){
+for (i in 1:length(pjs)){
  LinLSs <- c(LinLSs, sapply(pjs[[i]]@lines, function(x) length(x@Lines)))
 }
 LinLSs <- LinLSs %>% unlist()
@@ -170,7 +178,7 @@ new_id <- sapply(1:length(LinLSs), function(x) paste0(x, "_", seq.int(LinLSs[[x]
 ```{r}
 ## make a new data.frame (only route_id)
 DAT=data.frame(matrix(rep(NA,1),nrow=1))[-1,]
-for (i in 1:5){
+for (i in 1:length(pjs)){
   df <- data.frame(route_id = pjs[[i]]@data$VAR_IDENT)
   DAT <- rbind(DAT, df)
 }
@@ -267,7 +275,7 @@ flightff <- as.ffdf(tmp)
 
 Next I make new columns as follows
 ```{r}
-flightff$Delay <- ffifelse(flightff$dep_delay > 0, 1,0)
+flightff$Delay <- ffifelse(flightff$dep_delay > 0 | flightff$dep_delay == 0 , 1,0)
 flightff$DepHour <- flightff$hour
 flightff$Car <- ffifelse(flightff$carrier %in% as.factor(c("DL","US","DH","UA")), 1, 0)
 flightff$Night <- ffifelse(flightff$hour > 18 | flightff$hour < 6, 1, 0)
