@@ -1,35 +1,24 @@
 ---
 title: "Big Data Analytics Assignment 1"
-output: html_notebook
+output:
+  html_notebook: default
+  html_document: default
+  pdf_document: default
 ---
 
 ## Q1
 
 First I load the data files
 ```{r}
-dat <- read.csv("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/migration2012.csv")
-head(dat)
-```
-
-```{r}
-states <- read.csv("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/states_chord.csv")
-states
-```
-
-Next I reshape dat into the handful data format. I use **tidyr package** for the aim instead of **reshape package** because the foramer is the improved version of the latter.
-
-```{r}
-install.packages('tidyverse')
 library(tidyverse)
-```
+dat <- read.csv("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/migration2012.csv")
+states <- read.csv("/Users/susu/Desktop/Hong\ Kong/Semester2/Big_Data/assignment_data/as1/states_chord.csv")
 
-```{r}
 dat <- dat %>%
 tidyr::gather(key=From, value=value, Alabama,Alaska,Arizona,Arkansas,California,Colorado,Connecticut,Delaware,District.of.Columbia,Florida,Georgia,Hawaii,Idaho,Illinois,Indiana,Iowa,Kansas,Kentucky,Louisiana,Maine,Maryland,Massachusetts,Michigan,Minnesota,Mississippi,Missouri,Montana,Nebraska,Nevada,New.Hampshire,New.Jersey,New.Mexico,New.York,North.Carolina,North.Dakota,Ohio,Oklahoma,Oregon,Pennsylvania,Rhode.Island,South.Carolina,South.Dakota,Tennessee,Texas,Utah,Vermont,Virginia,Washington,West.Virginia,Wisconsin,Wyoming)
 ```
 
 Delete the puctuations.
-
 ```{r}
 dat <- data.frame(apply(dat, 2, function(y) gsub("[[:punct:]]", " ", y)))
 dat
@@ -175,6 +164,7 @@ new_id <- sapply(1:length(LinLSs), function(x) paste0(x, "_", seq.int(LinLSs[[x]
   unlist()
 ```
 
+make data frame
 ```{r}
 ## make a new data.frame (only route_id)
 DAT=data.frame(matrix(rep(NA,1),nrow=1))[-1,]
@@ -372,36 +362,3 @@ pred <- sdf_predict(decision_tree, test) %>%
 
 table(pred$BOROUGH, pred$prediction)
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
